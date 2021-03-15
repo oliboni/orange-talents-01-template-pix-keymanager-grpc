@@ -8,10 +8,12 @@ import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 import javax.validation.Constraint
 import javax.validation.Payload
+import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.annotation.AnnotationTarget.*
 import kotlin.reflect.KClass
 
-@Target(AnnotationTarget.FIELD)
-@Retention(AnnotationRetention.RUNTIME)
+@Target(FIELD)
+@Retention(RUNTIME)
 @Constraint(validatedBy = [UniqueValueValidator::class])
 @MustBeDocumented
 annotation class UniqueValue(

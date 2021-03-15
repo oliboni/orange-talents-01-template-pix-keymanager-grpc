@@ -8,20 +8,19 @@ package br.com.zup;
 
 service PixService {
   rpc registro(NovaChaveRequest) returns (NovaChaveResponse){}
+  rpc remove(RemoveChaveRequest) returns (RemoveChaveResponse){}
 }
-
+//Nova chave
 message NovaChaveRequest {
   string clienteId = 1;
   TipoChave tipoChave = 3;
   string valorChave = 4;
   TipoConta tipoConta = 5;
 }
-
 message NovaChaveResponse {
   string clienteId = 1;
   string pixId = 2;
 }
-
 enum TipoChave{
   UNKNOWN_KEY_TYPE = 0;
   CPF = 1;
@@ -29,10 +28,18 @@ enum TipoChave{
   EMAIL = 3;
   RANDOM = 4;
 }
-
 enum TipoConta{
   UNKNOWN_ACCOUNT_TYPE = 0;
   CONTA_CORRENTE = 1;
   CONTA_POUPANCA = 2;
 }
 
+//Remove chave
+message RemoveChaveRequest{
+  string chavePix = 1;
+  string clienteId = 2;
+}
+
+message RemoveChaveResponse{
+  string mensagem = 1;
+}

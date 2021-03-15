@@ -15,25 +15,25 @@ import javax.validation.constraints.NotNull
 @Introspected
 class ChavePixRequest(
     @field:NotBlank
-    @ValidUUID
-    val clienteId: String?,
+    @field:ValidUUID
+    val clienteId: String,
 
     @field:NotNull
-    val tipoChave: TipoDaChave?,
+    val tipoChave: TipoDaChave,
 
     @field:NotBlank
 //    @field:UniqueValue(domainClassName = "ChavePix",field = "chave")
-    val valorChave: String?,
+    val valorChave: String,
 
     @field:NotNull
-    val tipoConta: TipoDaConta?
+    val tipoConta: TipoDaConta
 ) {
 
     fun toModel(@Valid contaCliente: ContaCliente): ChavePix {
         return ChavePix(
             clienteId = UUID.fromString(clienteId),
-            tipoChave = TipoDaChave.valueOf(tipoChave!!.name),
-            chave = if (tipoChave == TipoDaChave.RANDOM) UUID.randomUUID().toString() else valorChave!!,
+            tipoChave = TipoDaChave.valueOf(tipoChave.name),
+            chave = if (tipoChave == TipoDaChave.RANDOM) UUID.randomUUID().toString() else valorChave,
             contaCliente = contaCliente
         )
     }
