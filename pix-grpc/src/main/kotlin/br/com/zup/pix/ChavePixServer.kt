@@ -8,6 +8,7 @@ import br.com.zup.compartilhados.exceptions.NotFoundException
 import br.com.zup.compartilhados.exceptions.PermissionDeniedException
 import br.com.zup.integracao.ClienteIntegracao
 import br.com.zup.integracao.PixKeysIntegracao
+import io.micronaut.http.HttpStatus
 import io.micronaut.validation.Validated
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -33,18 +34,27 @@ class ChavePixServer(
             throw AlreadyExistsException("Chave pix ${request.valorChave} já cadastrada!")
 
         log.info("Buscando conta do cliente ${request.clienteId}")
-        val response = contaClienteIntegracao.consultaConta(request.clienteId, request.tipoConta.toString())
-        val contaCliente = response.body()?.toModel() ?: throw IllegalStateException("Cliente não encontrado!")
+        val response = contaClienteIntegracao.consultaConta(request.clienteId, request.tipoConta.toString()).body()
+        val contaCliente = response?.toModel() ?: throw IllegalStateException("Cliente não encontrado!")
 
         log.info("Registrando pix no BCB!")
         val retornoBcb = pixKeysIntegracao.registraChave(
             CreatePixRequest(
                 request.tipoChave.name,
-                request.valorChave, contaCliente
+                request.valorChave,
+                contaCliente
             )
-        )
+        ).let {
+            if (it.status != HttpStatus.CREATED) {
+                throw IllegalStateException("Erro ao registrar chave PIX no Banco Central do Brasil!")
+            }
+            it.body()
+        }
 
-        val chavePix = retornoBcb.toModel(UUID.fromString(request.clienteId), contaCliente)
+        val chavePix = retornoBcb!!.toModel(
+            UUID.fromString(request.clienteId),
+            contaCliente
+        )
 
         log.info("Salvando chave ${chavePix.chave}")
         chavePixRepository.save(chavePix)
@@ -69,8 +79,12 @@ class ChavePixServer(
         DeletePixKeyRequest(
             chavePix.get().chave,
             chavePix.get().contaCliente.ispbInstituicao
-        ).let { request->
-            pixKeysIntegracao.deletaChave(chavePix.get().chave, request)
+        ).let { deleteRequest ->
+            pixKeysIntegracao.deletaChave(chavePix.get().chave, deleteRequest).also { deleteResponse ->
+                if (deleteResponse.status != HttpStatus.OK) {
+                    throw IllegalStateException("Erro ao remover chave PIX do Banco Central do Brasil")
+                }
+            }
         }
 
         log.info("Removendo chave interna")

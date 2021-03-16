@@ -10,7 +10,7 @@ class DefaultExceptionHandler : ExceptionHandler<Exception> {
         when(e){
             is IllegalArgumentException -> Status.INVALID_ARGUMENT.withDescription(e.message)
             is IllegalStateException -> Status.FAILED_PRECONDITION.withDescription(e.message)
-            is HttpClientResponseException -> Status.INVALID_ARGUMENT.withDescription(e.message)
+            is HttpClientResponseException -> Status.INTERNAL.withDescription("Erro interno de conexão!")
             else -> Status.UNKNOWN
         }.let { status->
             return StatusWithDatails(status.withCause(e))
