@@ -10,10 +10,12 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 @Entity
-@Table(uniqueConstraints = [UniqueConstraint(
-    name = "uk_chave_pix",
-    columnNames = ["chave"]
-)])
+@Table(
+    uniqueConstraints = [UniqueConstraint(
+        name = "uk_chave_pix",
+        columnNames = ["chave"]
+    )]
+)
 class ChavePix(
     @field:NotBlank
     @Column(nullable = false)
@@ -30,12 +32,16 @@ class ChavePix(
 
     @field:Valid
     @Embedded
-    val contaCliente: ContaCliente
+    val contaCliente: ContaCliente,
+
+    @Column(nullable = false)
+    val criadaEm: LocalDateTime
 ){
     @Id
     @GeneratedValue
     var id: UUID? = null
 
-    @Column(nullable = false)
-    val criadaEm: LocalDateTime = LocalDateTime.now()
+    override fun toString(): String {
+        return "ChavePix(clienteId=$clienteId, tipoChave=$tipoChave, chave='$chave', contaCliente=$contaCliente, id=$id, criadaEm=$criadaEm)"
+    }
 }

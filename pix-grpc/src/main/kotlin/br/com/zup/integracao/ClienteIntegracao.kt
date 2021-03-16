@@ -7,7 +7,7 @@ import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.QueryValue
 import io.micronaut.http.client.annotation.Client
 
-@Client("\${erpItau.server.account}")
+@Client("\${itau.server.account}")
 interface ClienteIntegracao{
 
     @Get("/{clientId}/contas?tipo={tipo}")

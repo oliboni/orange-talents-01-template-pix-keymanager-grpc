@@ -1,6 +1,13 @@
 package br.com.zup.compartilhados
 
-enum class TipoDaConta {
-    CONTA_CORRENTE,
-    CONTA_POUPANCA
+enum class TipoDaConta(tipoConta: String){
+    CONTA_CORRENTE("CACC"),
+    CONTA_POUPANCA("SVGS");
+
+    fun toBcb(): String {
+        return when (this) {
+            CONTA_CORRENTE -> "CACC"
+            CONTA_POUPANCA -> "SVGS"
+        }
+    }
 }

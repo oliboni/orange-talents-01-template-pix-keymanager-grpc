@@ -20,6 +20,11 @@ jpa:
 
 jpa.default.properties.hibernate.hbm2ddl.auto: update
 
-erpItau:
+itau:
   server:
-    account: ${SERVER_ACCOUNT:`http://localhost:9091/api/v1/clientes`}
+    account: ${SERVER_ITAU:`http://localhost:9091/api/v1/clientes`}
+  ispb: 60701190
+
+bcb:
+  pix:
+    keys: ${SERVER_BCB:`http://localhost:8082/api/v1/pix/keys`}

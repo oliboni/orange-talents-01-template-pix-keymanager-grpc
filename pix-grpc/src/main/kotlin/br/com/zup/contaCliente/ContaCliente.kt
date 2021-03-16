@@ -13,21 +13,27 @@ class ContaCliente(
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     val tipoConta: TipoDaConta,
+
     @field:NotBlank
     @Column(nullable = false)
     val nomeInstituicao: String,
+
     @field:NotBlank
     @Column(nullable = false)
     val ispbInstituicao: String,
+
     @field:NotBlank
     @Column(nullable = false)
     val agencia: String,
+
     @field:NotBlank
     @Column(nullable = false)
     val numero: String,
+
     @field:NotBlank
     @Column(nullable = false)
     val nomeTitular: String,
+
     @field:NotBlank
     @Column(nullable = false)
     val cpfTitular: String

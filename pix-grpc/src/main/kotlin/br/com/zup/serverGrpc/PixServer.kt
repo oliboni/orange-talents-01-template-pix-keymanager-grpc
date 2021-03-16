@@ -13,7 +13,7 @@ class PixServer(val chavePixServer: ChavePixServer): PixServiceGrpc.PixServiceIm
 
     override fun registro(request: NovaChaveRequest?, responseObserver: StreamObserver<NovaChaveResponse>?) {
         val chavePixRequest = request!!.toModel()
-        val response = chavePixServer.buscaContaCliente(chavePixRequest)
+        val response = chavePixServer.registraChave(chavePixRequest)
 
         responseObserver!!.onNext(NovaChaveResponse.newBuilder()
             .setClienteId(response.clienteId.toString())

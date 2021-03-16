@@ -27,7 +27,6 @@ class ValidUUIDValidator : ConstraintValidator<ValidUUID,String> {
         annotationMetadata: AnnotationValue<ValidUUID>,
         context: ConstraintValidatorContext
     ): Boolean {
-        println("aqui")
         if (value == null){
             return false
         }
