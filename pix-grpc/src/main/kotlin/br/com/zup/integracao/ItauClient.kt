@@ -8,7 +8,7 @@ import io.micronaut.http.annotation.QueryValue
 import io.micronaut.http.client.annotation.Client
 
 @Client("\${itau.server.account}")
-interface ClienteIntegracao{
+interface ItauClient{
 
     @Get("/{clientId}/contas?tipo={tipo}")
     fun consultaConta(@PathVariable clientId:String, @QueryValue tipo:String ):HttpResponse<ContaClienteResponse>

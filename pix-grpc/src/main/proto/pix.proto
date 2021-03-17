@@ -6,38 +6,97 @@ option java_outer_classname = "Pix";
 
 package br.com.zup;
 
+import "google/protobuf/timestamp.proto";
+
 service PixService {
   rpc registro(NovaChaveRequest) returns (NovaChaveResponse){}
   rpc remove(RemoveChaveRequest) returns (RemoveChaveResponse){}
+  rpc consulta(ConsultaChaveRequest) returns (ConsultaChaveRespose){}
+  rpc consultaByCliente(ConsultaByClienteRequest) returns (ConsultaByClienteResponse){}
 }
+
+//Consulta chave através do clienteId
+message ConsultaByClienteRequest{
+  string clienteId = 1;
+}
+
+message ConsultaByClienteResponse{
+  message ChavePix {
+    string pixId        = 1;
+    TipoChave tipoChave = 2;
+    string chave        = 3;
+    TipoConta tipoConta = 4;
+    google.protobuf.Timestamp criadoEm = 5;
+  }
+
+  string clienteId           = 1;
+  repeated ChavePix chavePix = 2;
+}
+
+
+//Consulta chave
+message ConsultaChaveRequest{
+  message FiltroPorPixId{
+    string clienteId = 1;
+    string pixId     = 2;
+  }
+
+  oneof filtro{
+    FiltroPorPixId chavePixId = 1;
+    string chave              = 2;
+  }
+}
+
+message ConsultaChaveRespose{
+  message ChavePix{
+    message ContaInfo{
+      TipoConta tipoConta = 1;
+      string instituicao  = 2;
+      string nomeTitular  = 3;
+      string cpfTitular   = 4;
+      string agencia      = 5;
+      string number       = 6;
+    }
+
+    TipoChave tipoChave = 1;
+    string chave        = 2;
+    ContaInfo conta     = 3;
+    google.protobuf.Timestamp criadoEm = 4;
+  }
+
+  string clienteId  = 1;
+  string chavePixId = 2;
+  ChavePix chavePix = 3;
+}
+
 //Nova chave
 message NovaChaveRequest {
-  string clienteId = 1;
+  string clienteId    = 1;
   TipoChave tipoChave = 3;
-  string valorChave = 4;
+  string valorChave   = 4;
   TipoConta tipoConta = 5;
 }
 message NovaChaveResponse {
   string clienteId = 1;
-  string pixId = 2;
+  string pixId     = 2;
 }
 enum TipoChave{
   UNKNOWN_KEY_TYPE = 0;
-  CPF = 1;
-  PHONE = 2;
-  EMAIL = 3;
-  RANDOM = 4;
+  CPF              = 1;
+  PHONE            = 2;
+  EMAIL            = 3;
+  RANDOM           = 4;
 }
 enum TipoConta{
   UNKNOWN_ACCOUNT_TYPE = 0;
-  CONTA_CORRENTE = 1;
-  CONTA_POUPANCA = 2;
+  CONTA_CORRENTE       = 1;
+  CONTA_POUPANCA       = 2;
 }
 
 //Remove chave
 message RemoveChaveRequest{
-  string chavePix = 1;
-  string clienteId = 2;
+  string chavePixId = 1;
+  string clienteId  = 2;
 }
 
 message RemoveChaveResponse{

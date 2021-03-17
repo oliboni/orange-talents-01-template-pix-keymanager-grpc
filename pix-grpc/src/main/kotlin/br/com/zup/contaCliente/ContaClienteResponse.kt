@@ -25,11 +25,7 @@ data class ContaClienteResponse(
 class Instituicao(
     val nome: String,
     val ispb: String
-) {
-    override fun toString(): String {
-        return "Instituicao(nome='$nome', ispb='$ispb')"
-    }
-}
+)
 
 class Titular(
     val id: String,

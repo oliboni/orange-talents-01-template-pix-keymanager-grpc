@@ -6,6 +6,7 @@ import io.micronaut.validation.validator.constraints.ConstraintValidatorContext
 import javax.inject.Singleton
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
+import javax.transaction.Transactional
 import javax.validation.Constraint
 import javax.validation.Payload
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -17,7 +18,7 @@ import kotlin.reflect.KClass
 @Constraint(validatedBy = [UniqueValueValidator::class])
 @MustBeDocumented
 annotation class UniqueValue(
-    val message: String = "Email already exists",
+    val message: String = "Already exists",
     val groups: Array<KClass<Any>> = [],
     val payload: Array<KClass<Payload>> = [],
     val field: String,
@@ -25,9 +26,10 @@ annotation class UniqueValue(
 )
 
 @Singleton
-class UniqueValueValidator (@PersistenceContext private val manager:EntityManager):
+open class UniqueValueValidator (@PersistenceContext private val manager:EntityManager):
     ConstraintValidator<UniqueValue, String> {
 
+    @Transactional
     override fun isValid(
         value: String?,
         annotationMetadata: AnnotationValue<UniqueValue>,
@@ -36,13 +38,15 @@ class UniqueValueValidator (@PersistenceContext private val manager:EntityManage
         if(value == null){
             return true
         }
-        manager.joinTransaction()
-        println(manager.isOpen)
-        val query = manager.createQuery("SELECT e FROM ${annotationMetadata.values["domainClassName"]} WHERE ${annotationMetadata.values["field"]}= :value")
+
+        val domainClass = annotationMetadata.stringValue("domainClassName").get()
+        val attribute = annotationMetadata.stringValue("field").get()
+
+        val query = manager.createQuery("SELECT 1 FROM $domainClass WHERE $attribute= :value")
             .setParameter("value", value)
 
-//        assert(query.resultList.size > 1) { "Mais de um $domainAttribute com valor $value na tabela $kClassName" }
-        manager.close()
+        assert(query.resultList.size > 1) { "Mais de um $domainClass com valor $value na tabela $attribute" }
+
         return query.resultList.isEmpty()
     }
 }

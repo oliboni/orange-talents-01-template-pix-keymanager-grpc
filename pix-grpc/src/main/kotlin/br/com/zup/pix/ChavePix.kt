@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 import javax.validation.Valid
+import javax.validation.constraints.AssertTrue
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
@@ -36,12 +37,18 @@ class ChavePix(
 
     @Column(nullable = false)
     val criadaEm: LocalDateTime
-){
+) {
+    fun pertenceAoCliente(clienteid: UUID): Boolean {
+        return clienteId == clienteid
+    }
+
     @Id
     @GeneratedValue
     var id: UUID? = null
 
-    override fun toString(): String {
-        return "ChavePix(clienteId=$clienteId, tipoChave=$tipoChave, chave='$chave', contaCliente=$contaCliente, id=$id, criadaEm=$criadaEm)"
+    init {
+        assert(clienteId != null) { "ClienteId não pode ser nulo" }
+        assert(tipoChave != null) { "tipoChave não pode ser nulo" }
+        assert(contaCliente != null) { "contaCliente não pode ser nulo" }
     }
 }

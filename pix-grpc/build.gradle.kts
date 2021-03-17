@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.4.10"
     id("org.jetbrains.kotlin.kapt") version "1.4.10"
     id("org.jetbrains.kotlin.plugin.allopen") version "1.4.10"
+    id ("org.jetbrains.kotlin.plugin.noarg") version "1.4.10"
     id("org.jetbrains.kotlin.plugin.jpa") version "1.5.0-M1"
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("io.micronaut.application") version "1.4.2"
@@ -54,9 +55,17 @@ dependencies {
     implementation("io.micronaut.xml:micronaut-jackson-xml")
 }
 
-allOpen {
-    annotation("javax.inject.Singleton")
-}
+//allOpen {
+//    annotation("javax.inject.Singleton")
+//    annotation("import javax.persistence.PersistenceContext")
+//    annotation("br.com.zup.compartilhados.validadores.UniqueValue")
+//}
+//
+//noArg {
+//    annotation("javax.inject.Singleton")
+//    annotation("import javax.persistence.PersistenceContext")
+//    annotation("br.com.zup.compartilhados.validadores.UniqueValue")
+//}
 
 application {
     mainClass.set("br.com.zup.ApplicationKt")

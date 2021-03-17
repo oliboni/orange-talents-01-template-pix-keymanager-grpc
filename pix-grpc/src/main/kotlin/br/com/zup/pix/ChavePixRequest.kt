@@ -2,6 +2,7 @@ package br.com.zup.pix
 
 import br.com.zup.compartilhados.TipoDaChave
 import br.com.zup.compartilhados.TipoDaConta
+import br.com.zup.compartilhados.validadores.UniqueValue
 import br.com.zup.compartilhados.validadores.ValidPixKey
 import br.com.zup.compartilhados.validadores.ValidUUID
 import io.micronaut.core.annotation.Introspected
@@ -13,14 +14,14 @@ import javax.validation.constraints.NotNull
 class ChavePixRequest(
     @field:NotBlank
     @field:ValidUUID
-    val clienteId: String,
+    val clienteId: String?,
 
     @field:NotNull
-    val tipoChave: TipoDaChave,
+    val tipoChave: TipoDaChave?,
 
-//    @field:UniqueValue(domainClassName = "ChavePix",field = "chave")
+//    @field:UniqueValue(domainClassName = "ChavePix",field = "chave", message = "Chave já cadastrada!")
     val valorChave: String?,
 
     @field:NotNull
-    val tipoConta: TipoDaConta
+    val tipoConta: TipoDaConta?
 )
