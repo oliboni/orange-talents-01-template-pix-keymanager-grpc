@@ -4,6 +4,7 @@ import br.com.zup.ConsultaByClienteResponse
 import br.com.zup.RemoveChaveResponse
 import br.com.zup.TipoChave
 import br.com.zup.TipoConta
+import br.com.zup.bcb.CreatePixKeyResponse
 import br.com.zup.bcb.CreatePixRequest
 import br.com.zup.bcb.DeletePixKeyRequest
 import br.com.zup.compartilhados.exceptions.AlreadyExistsException
@@ -13,6 +14,7 @@ import br.com.zup.integracao.ItauClient
 import br.com.zup.integracao.BcbClient
 import br.com.zup.pix.consultas.ConsultaChaveByClienteRequest
 import io.micronaut.http.HttpStatus
+import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.validation.Validated
 import org.slf4j.LoggerFactory
 import java.time.ZoneId
@@ -39,22 +41,29 @@ class ChavePixServer(
             throw AlreadyExistsException("Chave pix ${request.valorChave} já cadastrada!")
 
         log.info("Buscando conta do cliente ${request.clienteId}")
-        val response = contaItauClient.consultaConta(request.clienteId!!, request.tipoConta.toString()).body()
+        val response = contaItauClient.consultaConta(request.clienteId!!, request.tipoConta.toString())
+            .let {
+                if (it.status != HttpStatus.OK) {
+                    throw IllegalArgumentException("Cliente não encontrado!!")
+                }
+                it.body()
+            }
         val contaCliente = response?.toModel() ?: throw IllegalStateException("Cliente não encontrado!")
 
         log.info("Registrando pix no BCB!")
-        val retornoBcb = bcbClient.registraChave(
-            CreatePixRequest(
-                request.tipoChave!!.name,
-                request.valorChave,
-                contaCliente
-            )
-        ).let {
-            if (it.status != HttpStatus.CREATED) {
-                throw IllegalStateException("Erro ao registrar chave PIX no Banco Central do Brasil!")
-            }
-            it.body()
+        var retornoBcb: CreatePixKeyResponse?
+        try {
+            retornoBcb = bcbClient.registraChave(
+                CreatePixRequest(
+                    request.tipoChave!!.name,
+                    request.valorChave,
+                    contaCliente
+                )
+            ).body()
+        } catch (e : HttpClientResponseException){
+            throw IllegalStateException("Erro ao registrar chave PIX no Banco Central do Brasil!")
         }
+
 
         val chavePix = retornoBcb!!.toModel(
             UUID.fromString(request.clienteId),

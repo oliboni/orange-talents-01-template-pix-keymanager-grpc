@@ -46,9 +46,4 @@ class ChavePix(
     @GeneratedValue
     var id: UUID? = null
 
-    init {
-        assert(clienteId != null) { "ClienteId não pode ser nulo" }
-        assert(tipoChave != null) { "tipoChave não pode ser nulo" }
-        assert(contaCliente != null) { "contaCliente não pode ser nulo" }
-    }
 }
