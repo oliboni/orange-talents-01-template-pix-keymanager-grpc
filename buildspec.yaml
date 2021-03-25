@@ -9,10 +9,8 @@ phases:
   pre_build:
     commands:
       - echo skipped on `date`
-      - gradle wrapper --gradle-version 6.8.3
       - echo Building project
       - sh gradlew build
-      - gradle -v
 
   build:
     commands:
