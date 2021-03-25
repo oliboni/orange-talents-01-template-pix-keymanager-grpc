@@ -1,0 +1,7 @@
+#!/bin/bash
+aws ecr get-login-password --region sa-east-1 | podman login --username AWS --password-stdin 645847757084.dkr.ecr.sa-east-1.amazonaws.com
+
+isExistApp=`podman ps | grep key-manager-grpc`
+if [[ -n $isExistApp ]]; then
+    podman rm -f key-manager-grpc && podman run -p 50051:50051 --name key-manager-grpc 645847757084.dkr.ecr.sa-east-1.amazonaws.com
+fi

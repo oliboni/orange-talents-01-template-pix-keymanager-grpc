@@ -1,0 +1,6 @@
+#!/bin/bash
+
+isExistApp=`podman ps | grep key-manager-grpc`
+if [[ -n $isExistApp ]]; then
+    podman rm -f key-manager-grpc
+fi
