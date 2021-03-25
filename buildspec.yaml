@@ -21,4 +21,4 @@ phases:
 
 artifacts:
   files:
-    - build\libs\*all.jar
+    - Key-Manager-Grpc\build\libs\pix-0.1-all.jar
