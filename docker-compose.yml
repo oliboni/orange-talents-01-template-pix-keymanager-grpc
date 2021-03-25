@@ -21,5 +21,25 @@ services:
     volumes:
       - postgres-volume:/var/lib/postgresql/data
 
+  key-manager-grpc:
+    build: 
+      dockerfile: .\Dockerfile
+      context: .
+    image: key-manager-grpc/pix
+    container_name: key-manager-grpc
+    depends_on: 
+      - postgres
+    ports: 
+      - 50051:50051
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      SERVER_ITAU: erp-itau
+      PORT_SERVER_ITAU: 9091
+      SERVER_BCB: bcb
+      PORT_SERVER_BCB: 8082
+
 volumes:
   postgres-volume:

@@ -53,6 +53,8 @@ dependencies {
 
     //  XML
     implementation("io.micronaut.xml:micronaut-jackson-xml")
+
+    testRuntimeOnly("com.h2database:h2")
 }
 
 //allOpen {

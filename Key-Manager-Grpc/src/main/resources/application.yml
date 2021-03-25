@@ -4,7 +4,7 @@ micronaut:
 
 datasources:
   default:
-    url: ${DB_URL:`jdbc:postgresql://localhost:5432/pix`}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/pix
     driverClassName: org.postgresql.Driver
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
@@ -22,9 +22,9 @@ jpa.default.properties.hibernate.hbm2ddl.auto: update
 
 itau:
   server:
-    account: ${SERVER_ITAU:`http://localhost:9091/api/v1/clientes`}
+    account: http://${SERVER_ITAU:localhost}:${PORT_SERVER_ITAU:9091}/api/v1/clientes
   ispb: 60701190
 
 bcb:
   pix:
-    keys: ${SERVER_BCB:`http://localhost:8082/api/v1/pix/keys`}
+    keys: http://${SERVER_BCB:localhost}:${PORT_SERVER_BCB:8082}/api/v1/pix/keys
