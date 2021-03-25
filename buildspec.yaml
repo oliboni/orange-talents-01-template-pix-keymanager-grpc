@@ -21,4 +21,4 @@ phases:
 
 artifacts:
   files:
-    - target/key-manager-grpc.jar
+    - Key-Manager-Grpc\build\libs\*all.jar
