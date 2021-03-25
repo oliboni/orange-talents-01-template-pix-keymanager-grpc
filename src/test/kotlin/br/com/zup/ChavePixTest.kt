@@ -8,12 +8,4 @@ import javax.inject.Inject
 @MicronautTest
 class ChavePixTest {
 
-    @Inject
-    lateinit var application: EmbeddedApplication<*>
-
-    @Test
-    fun testItWorks() {
-        Assertions.assertTrue(application.isRunning)
-    }
-
 }
