@@ -1,10 +1,12 @@
 package br.com.zup.serverGrpc
 
 import br.com.zup.NovaChaveRequest
+import br.com.zup.RemoveChaveRequest
 import br.com.zup.TipoChave
 import br.com.zup.TipoConta
 import br.com.zup.bcb.CreatePixKeyResponse
 import br.com.zup.bcb.CreatePixRequest
+import br.com.zup.bcb.DeletePixKeyRequest
 import br.com.zup.compartilhados.Instituicoes
 import br.com.zup.compartilhados.TipoDaChave
 import br.com.zup.compartilhados.TipoDaConta
@@ -80,3 +82,21 @@ internal fun buildContaClienteResponse(
         numero = numero,
         titular = titular
     )
+
+internal fun buildDeletePixKeyRequest(
+    key: String = "04585079033",
+    participant: String = "60394079"
+) =
+    DeletePixKeyRequest(
+        key = key,
+        participant = participant
+    )
+
+internal fun buildRemoveChaveRequest(
+    chavePixId: String,
+    clientId: String
+)=
+    RemoveChaveRequest.newBuilder()
+        .setChavePixId(chavePixId)
+        .setClienteId(clientId)
+        .build()

@@ -1,9 +1,6 @@
 package br.com.zup.serverGrpc
 
-import br.com.zup.NovaChaveRequest
-import br.com.zup.PixServiceGrpc
-import br.com.zup.TipoChave
-import br.com.zup.TipoConta
+import br.com.zup.*
 import br.com.zup.bcb.CreatePixKeyResponse
 import br.com.zup.bcb.CreatePixRequest
 import br.com.zup.compartilhados.TipoDaConta
@@ -65,9 +62,9 @@ internal class PixServerTest(
      **/
 
     @Test
-    fun `deve registrar uma nova chave pix`() {
+    fun `deve registrar - nova chave pix`() {
         // cenario
-        `when`(itauClient.consultaConta(CLIENT_ID.toString(),TipoConta.CONTA_CORRENTE.name))
+        `when`(itauClient.consultaConta(CLIENT_ID.toString(), TipoConta.CONTA_CORRENTE.name))
             .thenReturn(HttpResponse.ok(buildContaClienteResponse()))
 
         `when`(bcbClient.registraChave(buildCreatePixKeyRequest()))
@@ -85,7 +82,7 @@ internal class PixServerTest(
     }
 
     @Test
-    fun `nao deve registrar uma chave ja cadastrada`() {
+    fun `nao deve registrar - chave ja cadastrada`() {
         // Salva chave no banco(cenário)
         pixRepository.save(buildChavePix(CLIENT_ID))
 
@@ -102,7 +99,7 @@ internal class PixServerTest(
     }
 
     @Test
-    fun `nao deve registrar uma chave quando nao encontra o cliente`() {
+    fun `nao deve registrar - chave quando nao encontra o cliente`() {
         // cenário
         `when`(itauClient.consultaConta(clientId = CLIENT_ID.toString(), tipo = TipoConta.CONTA_CORRENTE.toString()))
             .thenReturn(HttpResponse.notFound())
@@ -120,7 +117,7 @@ internal class PixServerTest(
     }
 
     @Test
-    fun `nao deve registrar chave pix quando parametros forem invalidos`() {
+    fun `nao deve registrar - chave pix quando parametros forem invalidos`() {
         // ação
         val result = assertThrows<StatusRuntimeException> {
             grpcClient.registro(NovaChaveRequest.newBuilder().build())
@@ -135,7 +132,110 @@ internal class PixServerTest(
     /**
      * deletaChave
      **/
+    @Test
+    fun `deve remover - chave pix`() {
+        //Cenario
+        val chavePix = buildChavePix(CLIENT_ID)
+        pixRepository.save(chavePix)
+        `when`(bcbClient.deletaChave("04585079033", buildDeletePixKeyRequest()))
+            .thenReturn(HttpResponse.ok())
 
+        //Acao
+        val result = grpcClient.remove(
+            buildRemoveChaveRequest(
+                clientId = CLIENT_ID.toString(),
+                chavePixId = chavePix.id.toString()
+            )
+        )
+
+        //Validacoes
+        assertEquals("Chave ${chavePix.id} excluída com sucesso!", result.mensagem)
+        assertEquals(0, pixRepository.findAll().size)
+    }
+    @Test
+    fun `nao deve remover - chave pix inexistente`() {
+        //Cenario
+        val chavePix = buildChavePix(CLIENT_ID)
+        pixRepository.save(chavePix)
+        `when`(bcbClient.deletaChave("04585079033", buildDeletePixKeyRequest()))
+            .thenReturn(HttpResponse.ok())
+
+        //Acao
+        val result = assertThrows<StatusRuntimeException> {
+            grpcClient.remove(
+                buildRemoveChaveRequest(
+                    clientId = CLIENT_ID.toString(),
+                    chavePixId = UUID.randomUUID().toString()
+                )
+            )
+        }
+
+        //Validacoes
+        assertEquals(Status.NOT_FOUND.code, result.status.code)
+        assertEquals("Chave não encontrada!", result.status.description)
+    }
+    @Test
+    fun `nao deve remover - a chave pix nao pertence ao cliente`() {
+        //Cenario
+        val chavePix = buildChavePix(CLIENT_ID)
+        pixRepository.save(chavePix)
+        `when`(bcbClient.deletaChave("04585079033", buildDeletePixKeyRequest()))
+            .thenReturn(HttpResponse.ok())
+
+        //Acao
+        val result = assertThrows<StatusRuntimeException> {
+            grpcClient.remove(
+                buildRemoveChaveRequest(
+                    clientId = UUID.randomUUID().toString(),
+                    chavePixId = chavePix.id.toString()
+                )
+            )
+        }
+
+        //Validacoes
+        assertEquals(Status.PERMISSION_DENIED.code, result.status.code)
+        assertEquals("Chave não pertence ao cliente informado!", result.status.description)
+    }
+    @Test
+    fun `nao deve remover - nao recebeu ok do bcbClient`() {
+        //Cenario
+        val chavePix = buildChavePix(CLIENT_ID)
+        pixRepository.save(chavePix)
+        `when`(bcbClient.deletaChave("04585079033", buildDeletePixKeyRequest()))
+            .thenReturn(HttpResponse.badRequest())
+
+        //Acao
+        val result = assertThrows<StatusRuntimeException> {
+            grpcClient.remove(
+                buildRemoveChaveRequest(
+                    clientId = CLIENT_ID.toString(),
+                    chavePixId = chavePix.id.toString()
+                )
+            )
+        }
+
+        //Validacoes
+        assertEquals(Status.FAILED_PRECONDITION.code, result.status.code)
+        assertEquals(1, pixRepository.findAll().size)
+        assertEquals("Erro ao remover chave PIX do Banco Central do Brasil", result.status.description)
+    }
+    @Test
+    fun `nao deve remover - dados invalidos`() {
+        //Cenario
+        val chavePix = buildChavePix(CLIENT_ID)
+        pixRepository.save(chavePix)
+
+        //Acao
+        val result = assertThrows<StatusRuntimeException> {
+            grpcClient.remove(
+                RemoveChaveRequest.newBuilder().build()
+            )
+        }
+
+        //Validacoes
+        assertEquals(Status.INVALID_ARGUMENT.code, result.status.code)
+        assertEquals(1, pixRepository.findAll().size)
+    }
 
     /**
      * consultaChave
