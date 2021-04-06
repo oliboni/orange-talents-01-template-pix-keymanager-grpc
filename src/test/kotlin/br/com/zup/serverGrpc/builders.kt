@@ -57,7 +57,7 @@ internal fun buildNovaChaveRequest(
     clienteId: UUID,
     tipoChave: TipoChave = TipoChave.CPF,
     valorChave: String = "04585079033",
-    tipoConta: TipoConta = TipoConta.CONTA_POUPANCA
+    tipoConta: TipoConta = TipoConta.CONTA_CORRENTE
 ) =
     NovaChaveRequest.newBuilder()
         .setClienteId(clienteId.toString())

@@ -60,43 +60,21 @@ internal class PixServerTest(
         pixRepository.deleteAll()
     }
 
+    /**
+     * Registro
+     **/
+
     @Test
     fun `deve registrar uma nova chave pix`() {
         // cenario
-        `when`(itauClient.consultaConta(CLIENT_ID.toString(), tipo = "CONTA_POUPANCA"))
+        `when`(itauClient.consultaConta(CLIENT_ID.toString(),TipoConta.CONTA_CORRENTE.name))
             .thenReturn(HttpResponse.ok(buildContaClienteResponse()))
 
-        `when`(
-            bcbClient.registraChave(
-                CreatePixRequest(
-                    KeyType = "CPF",
-                    Key = "04585079033",
-                    contaCliente = ContaClienteResponse(
-                        tipo = TipoDaConta.CONTA_POUPANCA,
-                        Instituicao(nome = "BCO ITAUBANK S.A.",ispb = "60394079") ,
-                        agencia = "0001",
-                        numero = "000001",
-                        Titular("123","Rodrigo Oliboni","04585079033")
-                    )
-                )
-            )
-        ).thenReturn(
-            HttpResponse.created(
-                CreatePixKeyResponse(
-                    keyType = "CPF",
-                    key = "04585079033",
-                    createdAt = LocalDateTime.now()
-                )
-            )
-        )
+        `when`(bcbClient.registraChave(buildCreatePixKeyRequest()))
+            .thenReturn(HttpResponse.created(buildCreatePixKeyResponse()))
 
         // Acao
-        val response = grpcClient.registro(NovaChaveRequest.newBuilder()
-            .setClienteId(CLIENT_ID.toString())
-            .setTipoChave(TipoChave.CPF)
-            .setValorChave("04585079033")
-            .setTipoConta(TipoConta.CONTA_POUPANCA)
-            .build())
+        val response = grpcClient.registro(buildNovaChaveRequest(CLIENT_ID))
 
         // Validacao
         with(response) {
@@ -153,6 +131,15 @@ internal class PixServerTest(
             assertEquals(Status.INVALID_ARGUMENT.code, result.status.code)
         }
     }
+
+    /**
+     * deletaChave
+     **/
+
+
+    /**
+     * consultaChave
+     **/
 
     @Factory
     class client {
