@@ -22,12 +22,12 @@ data class ContaClienteResponse(
     }
 }
 
-class Instituicao(
+data class Instituicao(
     val nome: String,
     val ispb: String
 )
 
-class Titular(
+data class Titular(
     val id: String,
     val nome: String,
     val cpf: String

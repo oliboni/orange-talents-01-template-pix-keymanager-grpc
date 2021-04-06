@@ -6,7 +6,7 @@ import br.com.zup.pix.ChavePix
 import java.time.LocalDateTime
 import java.util.*
 
-class CreatePixKeyResponse(
+data class CreatePixKeyResponse(
     val keyType: String,
     val key: String,
     val createdAt: LocalDateTime

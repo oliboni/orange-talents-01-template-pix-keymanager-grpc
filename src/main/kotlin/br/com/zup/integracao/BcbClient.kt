@@ -15,7 +15,7 @@ interface BcbClient {
         produces = [MediaType.APPLICATION_XML],
         consumes = [MediaType.APPLICATION_XML]
     )
-    fun registraChave(@Body request: CreatePixRequest): HttpResponse<CreatePixKeyResponse>
+    fun registraChave(@Body request: CreatePixRequest): HttpResponse<CreatePixKeyResponse?>
 
     @Delete(
         "/{key}",

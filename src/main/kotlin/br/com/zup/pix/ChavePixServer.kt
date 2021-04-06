@@ -13,6 +13,7 @@ import br.com.zup.compartilhados.exceptions.PermissionDeniedException
 import br.com.zup.integracao.ItauClient
 import br.com.zup.integracao.BcbClient
 import br.com.zup.pix.consultas.ConsultaChaveByClienteRequest
+import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.validation.Validated
@@ -51,29 +52,28 @@ class ChavePixServer(
         val contaCliente = response?.toModel() ?: throw IllegalStateException("Cliente não encontrado!")
 
         log.info("Registrando pix no BCB!")
-        var retornoBcb: CreatePixKeyResponse?
+//        var retornoBcb: HttpResponse<CreatePixKeyResponse?>
+        val a = CreatePixRequest(
+            request.tipoChave!!.name,
+            request.valorChave,
+            response
+        )
+        println(a)
         try {
-            retornoBcb = bcbClient.registraChave(
-                CreatePixRequest(
-                    request.tipoChave!!.name,
-                    request.valorChave,
-                    contaCliente
-                )
-            ).body()
-        } catch (e : HttpClientResponseException){
+            val retornoBcb = bcbClient.registraChave(
+                a
+            )
+            val chavePix = retornoBcb.body()!!.toModel(
+                UUID.fromString(request.clienteId),
+                contaCliente
+            )
+            log.info("Salvando chave ${chavePix.chave}")
+            chavePixRepository.save(chavePix)
+
+            return chavePix
+        } catch (e: HttpClientResponseException) {
             throw IllegalStateException("Erro ao registrar chave PIX no Banco Central do Brasil!")
         }
-
-
-        val chavePix = retornoBcb!!.toModel(
-            UUID.fromString(request.clienteId),
-            contaCliente
-        )
-
-        log.info("Salvando chave ${chavePix.chave}")
-        chavePixRepository.save(chavePix)
-
-        return chavePix
     }
 
     @Transactional

@@ -6,29 +6,30 @@ import br.com.zup.compartilhados.AccountType.SVGS
 import br.com.zup.compartilhados.TipoDaConta.CONTA_CORRENTE
 import br.com.zup.compartilhados.TipoDaConta.CONTA_POUPANCA
 import br.com.zup.contaCliente.ContaCliente
+import br.com.zup.contaCliente.ContaClienteResponse
 
-class CreatePixRequest(
+data class CreatePixRequest(
     val KeyType: String,
     val Key: String?,
-    contaCliente: ContaCliente
+    val contaCliente: ContaClienteResponse
 ) {
     val bankAccount = BankAccount(
-        participant = contaCliente.ispbInstituicao,
+        participant = contaCliente.instituicao.ispb,
         branch = contaCliente.agencia,
         accountNumber = contaCliente.numero,
-        accountType = when (contaCliente.tipoConta) {
+        accountType = when (contaCliente.tipo) {
             CONTA_CORRENTE -> CACC
             CONTA_POUPANCA -> SVGS
         }
     )
     val owner = Owner(
         type = Owner.OwnerType.NATURAL_PERSON,
-        name = contaCliente.nomeTitular,
-        taxIdNumber = contaCliente.cpfTitular
+        name = contaCliente.titular.nome,
+        taxIdNumber = contaCliente.titular.cpf
     )
 }
 
-class Owner(
+data class Owner(
     val type: OwnerType,
     val name: String,
     val taxIdNumber: String
@@ -39,7 +40,7 @@ class Owner(
     }
 }
 
-class BankAccount(
+data class BankAccount(
     val participant: String,
     val branch: String,
     val accountNumber: String,
